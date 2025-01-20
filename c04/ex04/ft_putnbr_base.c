@@ -1,78 +1,77 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_putnbr_base.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tmura <tmura@student.42tokyo.jp>           +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/18 22:30:17 by tmura             #+#    #+#             */
-/*   Updated: 2025/01/18 23:30:29 by tmura            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-
 #include <unistd.h>
-#include <stdio.h>
+
+void	ft_putchar(char c)
+{
+	write(1, &c, 1);
+}
+
+int	ft_strlen(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
+
+int	checkerror(char *str)
+{
+	int	i;
+	int	j;
+	int	x;
+
+	x = ft_strlen(str);
+	i = 0;
+	if (str[0] == '\0' || x == 1)
+		return (0);
+	while (str[i] != '\0')
+	{
+		if (str[i] <= 32 || str[i] == 127 || str[i] == 43 || str[i] == 45)
+			return (0);
+		j = i + 1;
+		while (j < ft_strlen(str))
+		{
+			if (str[i] == str[j])
+				return (0);
+			j++;
+		}
+		i++;
+	}
+	return (1);
+}
 
 void	ft_putnbr_base(int nbr, char *base)
 {
-	int		i;
-	int 	c;
-	int		cnt[300]={0};
+	int	len;
+	int	error;
+	long	nb;
 
-	i = 0;
-	while (base[i] != '\0' && base[i] != '+' && base[i] != '-')
+	error = checkerror(base);
+	len = ft_strlen(base);
+	nb = nbr;
+	if (error == 1)
 	{
-		if(cnt[base[i]]>0)
-			return;
-		cnt[base[i]]++;
-		i++;
-	}
-	if(i<=1)
-		return;
-	int		tmp;
-
-	tmp = nbr;
-	int		keta;
-	keta = 0;
-	while(tmp>0)
-	{
-		tmp/=i;
-		keta++;
-	}
-	tmp = nbr;
-	c = 0;
-	char num[keta];
-	char sixteen[16] = "0123456789ABCDEF";
-	while(c<keta)
-	{
-		if(i==16)
+		if (nb < 0)
 		{
-			num[c]=sixteen[tmp%i];
+			ft_putchar('-');
+			nb *= -1;
 		}
-		else
+		if (nb < len)
+			ft_putchar(base[nb]);
+		if (nb >= len)
 		{
-			num[c]=(tmp%i) + '0';
-		}
-		tmp/=i;
-		c++;
-	}
-	c=0;
-	//printf("%d",i);
-	if (i > 1)
-	{
-		if (nbr < 0)
-		{
-			nbr *= -1;
-			write(1,"-",1);
-		}
-		while(keta){
-			write(1, &num[keta-1], 1);
-			keta--;
+			ft_putnbr_base(nb / len, base);
+			ft_putnbr_base(nb % len, base);
 		}
 	}
 }
-int main()
+int main(void)
 {
-	ft_putnbr_base(1413241,"0123456789ABCDEF");
+	ft_putnbr_base(3242, "0123456789ABCDEF"); // 出力: "CA2"
+	ft_putnbr_base(3242, "01");              // 出力: "110010101010"
+	ft_putnbr_base(3242, "poneyvif");
+	ft_putnbr_base(3242, "0123456789");             // 出力なし (重複あり)
+	ft_putnbr_base(3242, "0");               // 出力なし (基数が1以下)
+	return 0;
 }
